@@ -1,19 +1,20 @@
 "use client";
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, Box, TextField } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Container, Card, CardContent, Box, TextField, Grid } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CategoryIcon from "@mui/icons-material/Category";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AddIcon from "@mui/icons-material/Add";
 import Logo from "../../accets/readmate-logo.png"
 import Image from "next/image";
-import { Margin } from "@mui/icons-material";
 import { useState } from "react";
 import AddBookForm from "@/components/form-addBook";
-
+import Link  from "next/link";
+import { useRouter } from "next/navigation";
 
 
 export default function HomePage() {
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const router = useRouter();
 
   return (
     <div>
@@ -39,14 +40,13 @@ export default function HomePage() {
         <Typography>Discover millions of books, manage your collection, and connect with readers worldwide.</Typography>
       </Box>
 
-      <Container sx={{ mt: 5 }}>
-        {/* Action Cards */}
+      <Container sx={{ mt: 5 , backgroundColor: "#fff"}}>
         <Grid container spacing={3}>
           {[
             { icon: <SearchIcon />, title: "Search Books", desc: "Find your next read from our vast collection" },
             { icon: <CategoryIcon />, title: "Browse Categories", desc: "Explore books by genre and topic" },
-            { icon: <LibraryBooksIcon />, title: "View Library", desc: "Access your personal book collection" },
-            { icon: <AddIcon />, title: "Add New Book", desc: "Contribute to our growing library", onclick:() => setIsFormVisible(true) },
+            { icon: <LibraryBooksIcon />, title: "View Library", desc: "Access your personal book collection", onclick: () => router.push("/bookList") },
+            { icon: <AddIcon />, title: "Add New Book", desc: "Add book to your personal book collection", onclick:() => setIsFormVisible(true) },
           ].map((item, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
                 <Button onClick={item.onclick ? item.onclick : undefined} sx={{ textDecoration: "none" }}>
@@ -62,7 +62,6 @@ export default function HomePage() {
           ))}
         </Grid>
 
-        {/* Recent Activities, Stats, Notifications */}
         <Grid container spacing={3} sx={{ mt: 5 }}>
           <Grid item={true} xs={12} sm={6} md={4} component="div">
             <Card sx={{ p: 2 }}>
