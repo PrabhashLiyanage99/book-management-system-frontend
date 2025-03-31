@@ -12,3 +12,12 @@ export const SIGNUP_MUTATION = gql`
         signup(name: $name, email: $email, password: $password) 
     }
 `;
+
+
+export const GET_BOOK_COUNT = gql`
+  query GetBookCount($page: Int, $pageSize: Int) {
+    getAllBooks(page: $page, pageSize: $pageSize) {
+      totalCount
+    }
+  }
+`;

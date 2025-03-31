@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect} from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Container, CircularProgress, Paper, TableContainer, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Menu, MenuItem, TablePagination } from "@mui/material";
+import { Container, CircularProgress, Paper, TableContainer, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Menu, MenuItem, TablePagination ,Grid, TextField} from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import BookPopup from "@/components/bookDetailes";
 import EditBookForm from "@/components/form-editBook";
 import DeleteBookButton from "@/components/deleteButton";
+import Header from "@/components/Header";
 interface Book {
     id: string;
     title: string;
@@ -17,15 +18,15 @@ interface Book {
 
 const GET_BOOKS_QUERY = gql`
   query GetAllBooks($page: Int, $pageSize: Int) {
-    getAllBooks (page: $page, pageSize: $pageSize){
-    books{
-      id
-      title
-      author
-      publishedYear
-      genre
-      coverImage
-    }
+    getAllBooks(page: $page, pageSize: $pageSize) {
+      books {
+        id
+        title
+        author
+        publishedYear
+        genre
+        coverImage
+      }
       totalCount
     }
   }
@@ -34,6 +35,9 @@ const BookList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [totalCount, setTotalCount] = useState(0);
+    const [titleFilter, setTitleFilter] = useState('');
+    const [authorFilter, setAuthorFilter] = useState('');
+    const [genreFilter, setGenreFilter] = useState('');
     const { loading, error, data , refetch} = useQuery(GET_BOOKS_QUERY, {
       variables: { page: page + 1, pageSize: rowsPerPage},
       fetchPolicy: "network-only"
@@ -47,10 +51,9 @@ const BookList = () => {
 
     useEffect(() => {
       if (data?.getAllBooks?.books) {
-        setBooks(data.getAllBooks.books);
-        setTotalCount(data.getAllBooks.totalCount);
+          setBooks(data.getAllBooks.books);
       }
-    }, [data]);
+  }, [data]);
     
 
     if (loading) return (
@@ -64,6 +67,7 @@ const BookList = () => {
         <Typography color="error">Error loading books: {error?.message}</Typography>
       </Container>
     );
+    
 
     const handleRowClick = (book: Book) => {
         setSelectedBook(book);
@@ -97,11 +101,59 @@ const BookList = () => {
       setPage(0);
     };
 
+    const filteredBooks = books.filter(book => {
+      return (!titleFilter || book.title.toLowerCase().includes(titleFilter.toLowerCase())) &&
+          (!authorFilter || book.author.toLowerCase().includes(authorFilter.toLowerCase())) &&
+          (!genreFilter || book.genre.toLowerCase().includes(genreFilter.toLowerCase()));
+    });
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, filterType: string) => {
+      const value = e.target.value;
+      if (filterType === 'title') {
+          setTitleFilter(value);
+      } else if (filterType === 'author') {
+          setAuthorFilter(value);
+      } else if (filterType === 'genre') {
+          setGenreFilter(value);
+      }
+  };
+
     return (
+      <div>
+         <Header></Header>
         <Container>
           <Typography variant="h4" gutterBottom sx={{ textAlign: "center", marginTop: "20px" }}>
             Book List
           </Typography>
+          <Grid container spacing={2} sx={{ marginBottom: "20px" }}>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Title"
+                fullWidth
+                value={titleFilter}
+                onChange={(e) => handleFilterChange(e, 'title')}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Author"
+                fullWidth
+                value={authorFilter}
+                onChange={(e) => handleFilterChange(e, 'author')}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Genre"
+                fullWidth
+                value={genreFilter}
+                onChange={(e) => handleFilterChange(e, 'genre')}
+                variant="outlined"
+              />
+            </Grid>
+          </Grid>
           <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
             <Table>
               <TableHead>
@@ -114,16 +166,15 @@ const BookList = () => {
                 </TableRow>
               </TableHead> 
               <TableBody>
-                {books.length >= 0 ? (
-                  books.map((book) => (
-                    <TableRow key={book.id} hover 
-                    sx={{ cursor: "pointer" , '&:hover': { backgroundColor: 'action.hover', boxShadow: 1 } }}>
-                      <TableCell>
-                        {book.coverImage ? (
-                          <img src="https://res.cloudinary.com/bloomsbury-atlas/image/upload/w_568,c_scale,dpr_1.5/jackets/9781408855713.jpg" alt={book.title} width={140} height={175} />
-                        ) : (
-                          <Typography>No Image</Typography>
-                        )}
+              {filteredBooks.length > 0 ? (
+                  filteredBooks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((book) => (
+                  <TableRow key={book.id} hover sx={{ cursor: "pointer" }} onClick={() => handleRowClick(book)}>
+                  <TableCell>
+                  {book.coverImage ? (
+                      <img src={book.coverImage} alt={book.title} width={140} height={175} />
+                    ) : (
+                    <Typography>No Image</Typography>
+                    )}
                       </TableCell>
                       <TableCell onClick={() => handleRowClick(book)}>{book.title}</TableCell>
                       <TableCell onClick={() => handleRowClick(book)}>{book.author}</TableCell>
@@ -167,6 +218,7 @@ const BookList = () => {
             <EditBookForm open={open} onClose={() => setOpen(false)} book={selectedEditBook} />
           )}
         </Container>
+        </div>
       );
     };
     

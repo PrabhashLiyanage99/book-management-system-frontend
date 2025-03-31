@@ -120,7 +120,7 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               error={!!errors.password}
               helperText={errors.password}
-              className={styles.inputField}
+              className={styles.inputField}  
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -150,10 +150,6 @@ const LoginPage = () => {
               Create Account
             </Button>
           </form>
-
-          <Typography variant="body2" className={styles.footerText}>
-            vnejrvnekjnvkjervn
-          </Typography>
           
           <Typography variant="caption" className={styles.credit}>
             ReadMate

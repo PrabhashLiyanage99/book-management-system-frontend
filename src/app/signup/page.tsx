@@ -101,7 +101,7 @@ const SignupPage = () => {
             <Image src={LoginImage} alt="Signup Image" width={400} height={400} className={styles.logo} />
           </Box>
           <Box sx={{ flex: 1, p: 3 }}>
-            <Typography variant="h4" gutterBottom className={styles.welcomeText}>
+            <Typography  variant="h4" gutterBottom>
               Create Your Account
             </Typography>
             <Typography variant="subtitle1" gutterBottom className={styles.subtitle}>
@@ -171,7 +171,7 @@ const SignupPage = () => {
                     <InputAdornment position="end">
                       <IconButton onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
+                      </IconButton>  
                     </InputAdornment>
                   ),
                 }}
