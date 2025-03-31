@@ -75,6 +75,7 @@ const BookList = () => {
     };
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, bookId: string) => {
+      event.stopPropagation();
       setAnchorEl(event.currentTarget);
       setMenuBookId(bookId);
     };
@@ -185,8 +186,10 @@ const BookList = () => {
                           <MoreVertIcon/>
                         </IconButton>
                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl && menuBookId === book.id)} onClose={handleMenuClose}>
-                          <MenuItem onClick={() => { seSelectedEditBook(book); setOpen(true); }}>Edit</MenuItem>
+                          <MenuItem onClick={(event) => {event.stopPropagation(); seSelectedEditBook(book); setOpen(true); }}>Edit</MenuItem>
+                          <MenuItem onClick={(event) => {event.stopPropagation();}}>
                           <DeleteBookButton bookId={book.id} OnSuccess={() => { handleMenuClose(); handleDeleteSuccess(book.id)}} />
+                          </MenuItem>
                         </Menu>
                       </TableCell>
                     </TableRow>
