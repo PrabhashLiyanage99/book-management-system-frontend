@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Container, CircularProgress, Paper, TableContainer, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button } from "@mui/material";
+import { Container, CircularProgress, Paper, TableContainer, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import BookPopup from "@/components/bookDetailes";
-
+import EditBookForm from "@/components/form-editBook";
+import DeleteBookButton from "@/components/deleteButton";
 interface Book {
     id: string;
     title: string;
@@ -27,9 +29,14 @@ const GET_BOOKS_QUERY = gql`
   }
 `;
 const BookList = () => {
-    const { loading, error, data } = useQuery<{ getAllBooks: Book[] }>(GET_BOOKS_QUERY);
+    const { loading, error, data , refetch} = useQuery<{ getAllBooks: Book[] }>(GET_BOOKS_QUERY);
     const [open, setOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [menuBookId, setMenuBookId] = useState<string | null>(null);
+    const [selectedEditBook, seSelectedEditBook] = useState<Book | null>(null)
+    const [books, setBooks] = useState<Book[]>([]);
+
 
     if (loading) return (
        <Container sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -47,6 +54,21 @@ const BookList = () => {
         setSelectedBook(book);
         setOpen(true);
     };
+
+    const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, bookId: string) => {
+      setAnchorEl(event.currentTarget);
+      setMenuBookId(bookId);
+    };
+
+    const handleMenuClose = () => {
+      setAnchorEl(null);
+      setMenuBookId(null);
+    }
+
+    const handleDeleteSuccess = (deletedBookId: string) => {
+      const updatedBooks = data?.getAllBooks.filter((book) => book.id !== deletedBookId);
+      refetch();
+    }
 
     return (
         <Container>
@@ -67,7 +89,7 @@ const BookList = () => {
               <TableBody>
                 {data?.getAllBooks?.length || 0 > 0 ? (
                   (data?.getAllBooks ?? []).map((book) => (
-                    <TableRow key={book.id} hover onClick={() => handleRowClick(book)}
+                    <TableRow key={book.id} hover 
                     sx={{ cursor: "pointer" , '&:hover': { backgroundColor: 'action.hover', boxShadow: 1 } }}>
                       <TableCell>
                         {book.coverImage ? (
@@ -76,10 +98,22 @@ const BookList = () => {
                           <Typography>No Image</Typography>
                         )}
                       </TableCell>
-                      <TableCell>{book.title}</TableCell>
-                      <TableCell>{book.author}</TableCell>
-                      <TableCell>{book.publishedYear}</TableCell>
-                      <TableCell>{book.genre}</TableCell>
+                      <TableCell onClick={() => handleRowClick(book)}>{book.title}</TableCell>
+                      <TableCell onClick={() => handleRowClick(book)}>{book.author}</TableCell>
+                      <TableCell onClick={() => handleRowClick(book)}>{book.publishedYear}</TableCell>
+                      <TableCell onClick={() => handleRowClick(book)}>{book.genre}</TableCell>
+                      <TableCell align="right">
+                        <IconButton onClick={(event) => handleMenuOpen(event, book.id) }>
+                          <MoreVertIcon/>
+                        </IconButton>
+                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl && menuBookId === book.id)} onClose={handleMenuClose}>
+                          <MenuItem onClick={() => { seSelectedEditBook(book); setOpen(true); }}>Edit</MenuItem>
+                          <DeleteBookButton bookId={book.id} OnSuccess={() => { handleMenuClose(); handleDeleteSuccess(book.id)}} />
+                        </Menu>
+                        {selectedEditBook && (
+                        <EditBookForm open={open} onClose={() => setOpen(false)} book={selectedEditBook} />
+                          )}
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (

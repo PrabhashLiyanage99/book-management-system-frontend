@@ -9,6 +9,7 @@ interface BookPopupProps {
 }
 
 const BookPopup = ({ open, onClose, selectedBook }: BookPopupProps) => {
+    
     if (!selectedBook) return null;
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
