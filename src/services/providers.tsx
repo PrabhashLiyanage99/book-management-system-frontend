@@ -10,3 +10,5 @@ const client = new ApolloClient({
 export function Providers({ children }: { children: React.ReactNode}) {
     return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
+
+export default client;

@@ -8,8 +8,9 @@ import Logo from "../../accets/readmate-logo.png"
 import Image from "next/image";
 import { useState } from "react";
 import AddBookForm from "@/components/form-addBook";
-import Link  from "next/link";
+import AuthWrapper from "@/components/AuthWrapper";
 import { useRouter } from "next/navigation";
+import LogoutButton from "@/components/logoutButton";
 
 
 export default function HomePage() {
@@ -17,8 +18,8 @@ export default function HomePage() {
     const router = useRouter();
 
   return (
+    <AuthWrapper>
     <div>
-     
       <AppBar position="static" sx={{ backgroundColor: "#fff", color: "#000", boxShadow: "none" }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box display="flex">
@@ -30,12 +31,12 @@ export default function HomePage() {
             <Button color="primary">Categories</Button>
             <Button color="primary">About</Button>
           </Box>
-          <Button variant="contained" color="primary">Sign In</Button>
+          <LogoutButton/>
         </Toolbar>
       </AppBar>
 
      
-      <Box sx={{ background: "linear-gradient(to right, #001F3F, #0052D4)", color: "white", textAlign: "center", py: 5 }}>
+      <Box sx={{ background: "linear-gradient(to right, #ad79e1, #0099f2)", color: "white", textAlign: "center", py: 5 }}>
         <Typography variant="h4" fontWeight="bold">Welcome to Your Digital Library</Typography>
         <Typography>Discover millions of books, manage your collection, and connect with readers worldwide.</Typography>
       </Box>
@@ -113,6 +114,6 @@ export default function HomePage() {
       </Container>
       <AddBookForm open={isFormVisible} onClose={() => setIsFormVisible(false)} />
     </div>
-    
+    </AuthWrapper>
   );
 }
