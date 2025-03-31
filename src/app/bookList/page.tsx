@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Container, CircularProgress, Paper, TableContainer, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Menu, MenuItem } from "@mui/material";
+import { Container, CircularProgress, Paper, TableContainer, Typography, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Menu, MenuItem, TablePagination } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import BookPopup from "@/components/bookDetailes";
 import EditBookForm from "@/components/form-editBook";
@@ -17,8 +16,9 @@ interface Book {
 }
 
 const GET_BOOKS_QUERY = gql`
-  query GetAllBooks {
-    getAllBooks {
+  query GetAllBooks($page: Int, $pageSize: Int) {
+    getAllBooks (page: $page, pageSize: $pageSize){
+    books{
       id
       title
       author
@@ -26,10 +26,18 @@ const GET_BOOKS_QUERY = gql`
       genre
       coverImage
     }
+      totalCount
+    }
   }
 `;
 const BookList = () => {
-    const { loading, error, data , refetch} = useQuery<{ getAllBooks: Book[] }>(GET_BOOKS_QUERY);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [totalCount, setTotalCount] = useState(0);
+    const { loading, error, data , refetch} = useQuery(GET_BOOKS_QUERY, {
+      variables: { page: page + 1, pageSize: rowsPerPage},
+      fetchPolicy: "network-only"
+    });
     const [open, setOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -37,6 +45,13 @@ const BookList = () => {
     const [selectedEditBook, seSelectedEditBook] = useState<Book | null>(null)
     const [books, setBooks] = useState<Book[]>([]);
 
+    useEffect(() => {
+      if (data?.getAllBooks?.books) {
+        setBooks(data.getAllBooks.books);
+        setTotalCount(data.getAllBooks.totalCount);
+      }
+    }, [data]);
+    
 
     if (loading) return (
        <Container sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -66,9 +81,21 @@ const BookList = () => {
     }
 
     const handleDeleteSuccess = (deletedBookId: string) => {
-      const updatedBooks = data?.getAllBooks.filter((book) => book.id !== deletedBookId);
+      const updatedBooks = books.filter((book) => book.id !== deletedBookId);
       refetch();
     }
+
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+      const maxPage = Math.ceil(totalCount / rowsPerPage) -1;
+      if (newPage >= 0 && newPage <= maxPage) {
+        setPage(newPage);
+      }
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+    };
 
     return (
         <Container>
@@ -87,8 +114,8 @@ const BookList = () => {
                 </TableRow>
               </TableHead> 
               <TableBody>
-                {data?.getAllBooks?.length || 0 > 0 ? (
-                  (data?.getAllBooks ?? []).map((book) => (
+                {books.length >= 0 ? (
+                  books.map((book) => (
                     <TableRow key={book.id} hover 
                     sx={{ cursor: "pointer" , '&:hover': { backgroundColor: 'action.hover', boxShadow: 1 } }}>
                       <TableCell>
@@ -110,9 +137,6 @@ const BookList = () => {
                           <MenuItem onClick={() => { seSelectedEditBook(book); setOpen(true); }}>Edit</MenuItem>
                           <DeleteBookButton bookId={book.id} OnSuccess={() => { handleMenuClose(); handleDeleteSuccess(book.id)}} />
                         </Menu>
-                        {selectedEditBook && (
-                        <EditBookForm open={open} onClose={() => setOpen(false)} book={selectedEditBook} />
-                          )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -126,8 +150,21 @@ const BookList = () => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <TablePagination
+          rowsPerPageOptions={[5,10,25]}
+          component="div"
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          />
           {selectedBook && (
             <BookPopup open={open} onClose={() => setOpen(false)} selectedBook={selectedBook}  />
+          )}
+          {selectedEditBook && (
+            <EditBookForm open={open} onClose={() => setOpen(false)} book={selectedEditBook} />
           )}
         </Container>
       );
