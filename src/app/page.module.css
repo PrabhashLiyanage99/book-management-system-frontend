@@ -166,3 +166,15 @@ a.secondary {
     filter: invert();
   }
 }
+
+/* .page::-webkit-scrollbar {
+  display: none;
+}
+
+.page {
+  scrollbar-width: none;
+}
+
+.page {
+  -ms-overflow-style: none;
+} */

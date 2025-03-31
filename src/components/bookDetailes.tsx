@@ -9,6 +9,7 @@ interface BookPopupProps {
 }
 
 const BookPopup = ({ open, onClose, selectedBook }: BookPopupProps) => {
+    
     if (!selectedBook) return null;
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -34,7 +35,7 @@ const BookPopup = ({ open, onClose, selectedBook }: BookPopupProps) => {
                 
                 <Box sx={{ mt: 2 }} flex={1} display="flex" justifyContent="center" alignItems="flex-end" >
                 <img
-                    src="https://res.cloudinary.com/bloomsbury-atlas/image/upload/w_568,c_scale,dpr_1.5/jackets/9781408855713.jpg"
+                    src={selectedBook.coverImage}
                     alt={selectedBook.title}
                     width={200}
                     height={255}
@@ -48,10 +49,10 @@ const BookPopup = ({ open, onClose, selectedBook }: BookPopupProps) => {
                     Synopsis
                 </Typography>
                 <Typography variant="body1" paragraph>
-                Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived. To see how things would be if you had made other choices... Would you have done anything different, if you had the chance to undo your regrets?
+                Harry Potter, a young boy raised by his cruel aunt and uncle, discovers on his 11th birthday that he is a wizard and has been accepted into Hogwarts School of Witchcraft and Wizardry. At Hogwarts, he befriends Ron Weasley and Hermione Granger, learns magic, and uncovers secrets about his past. He finds out that his parents were murdered by the dark wizard Lord Voldemort, who mysteriously failed to kill baby Harry, leaving him with a lightning-shaped scar. Over the years, Harry faces numerous challenges, including the mystery of the Philosopher’s Stone, the deadly Chamber of Secrets, and the return of Voldemort, who seeks to regain power and take over the wizarding world.
                 </Typography>
                 <Typography variant="body1" paragraph>
-                Nora Seed finds herself faced with this decision. Faced with the possibility of changing her life for a new one, following a different career, undoing old breakups, realizing her dreams of becoming a glaciologist; she must search within herself as she travels through the Midnight Library to decide what is truly fulfilling in life, and what makes it worth living in the first place.
+                As Voldemort rises again, Harry learns of a prophecy that foretells his role in the final battle against the Dark Lord. With the help of his friends and mentors like Dumbledore, he searches for Horcruxes, objects containing pieces of Voldemort’s soul, to defeat him. In a climactic battle at Hogwarts, Harry ultimately destroys the last Horcruxes and defeats Voldemort once and for all. After the war, peace is restored, and Harry goes on to build a family of his own. His journey from an orphaned boy to the hero of the wizarding world cements his legacy as one of the greatest wizards in history.
                 </Typography>
 
                 <Divider sx={{ my: 2 }} />

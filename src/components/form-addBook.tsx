@@ -28,8 +28,8 @@ const ADD_BOOK_MUTATION = gql`
   }
 `;
 
-interface AddBookFormProps{
-  open:boolean;
+interface AddBookFormProps {
+  open: boolean;
   onClose: () => void;
 }
 
@@ -39,9 +39,27 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
   const [genre, setGenre] = useState("");
   const [publishedYear, setPublishedYear] = useState("");
   const [coverImage, setCoverImage] = useState("");
-  const [addBook, {loading, error }] = useMutation(ADD_BOOK_MUTATION);
+  const [errors, setErrors] = useState({
+    title: "",
+    author: "",
+    genre: "",
+    publishedYear: ""
+  });
+
+  const [addBook, { loading, error }] = useMutation(ADD_BOOK_MUTATION);
+
+  const validateForm = () => {
+    const newErrors: any = {};
+    if (!title) newErrors.title = "Book title is required";
+    if (!author) newErrors.author = "Author is required";
+    if (!genre) newErrors.genre = "Genre is required";
+    if (!publishedYear) newErrors.publishedYear = "Published year is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
+    if (!validateForm()) return;
     try {
       await addBook({ 
         variables: {
@@ -52,7 +70,6 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
           coverImage
         }
       });
-      alert("Book added successfully!");
       onClose();
     } catch (err) {
       console.error("Error adding book:", err);
@@ -70,6 +87,8 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
           fullWidth 
           value={title} 
           onChange={(e) => setTitle(e.target.value)}
+          error={!!errors.title}
+          helperText={errors.title}
         />
         <TextField 
           margin="dense" 
@@ -77,6 +96,8 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
           fullWidth 
           value={author} 
           onChange={(e) => setAuthor(e.target.value)} 
+          error={!!errors.author}
+          helperText={errors.author}
         />
         <TextField 
           margin="dense" 
@@ -84,6 +105,8 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
           fullWidth 
           value={genre} 
           onChange={(e) => setGenre(e.target.value)}
+          error={!!errors.genre}
+          helperText={errors.genre}
         />
         <TextField 
           margin="dense" 
@@ -91,6 +114,8 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
           fullWidth 
           value={publishedYear} 
           onChange={(e) => setPublishedYear(e.target.value)}
+          error={!!errors.publishedYear}
+          helperText={errors.publishedYear}
         />
         <TextField 
           margin="dense" 
