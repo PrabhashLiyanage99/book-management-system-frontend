@@ -21,3 +21,19 @@ export const GET_BOOK_COUNT = gql`
     }
   }
 `;
+
+export const GET_BOOKS_QUERY = gql`
+  query GetAllBooks($page: Int, $pageSize: Int, $title: String, $author: String, $genre: String) {
+    getAllBooks(page: $page, pageSize: $pageSize, title: $title, author: $author, genre: $genre) {
+      books {
+        id
+        title
+        author
+        publishedYear
+        genre
+        coverImage
+      }
+      totalCount
+    }
+  }
+`;

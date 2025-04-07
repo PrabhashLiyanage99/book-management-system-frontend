@@ -33,6 +33,7 @@ mutation UpdateBook(
 interface EditBookFormProps {
     open: boolean;
     onClose: () => void;
+    onSuccess: () => void;
     book: {
         id: string;
         title: string;
@@ -43,7 +44,7 @@ interface EditBookFormProps {
     };
 }
 
- const EditBookForm = ({ open, onClose, book }: EditBookFormProps) => {
+ const EditBookForm = ({ open, onClose, book, onSuccess }: EditBookFormProps) => {
     const [title, setTitle] = useState(book.title);
     const [author, setAuthor] = useState(book.author);
     const [genre, setGenre] = useState(book.genre);
@@ -58,8 +59,8 @@ interface EditBookFormProps {
                 variables: { id: book.id, title, author, publishedYear, genre, coverImage}
 
             });
-            alert("Book updated successfully!");
             onClose();
+            onSuccess();
         }catch (err) {
             console.error("Error updating book:",err);
         }

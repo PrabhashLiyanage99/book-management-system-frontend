@@ -10,6 +10,9 @@ import LoginImage from '../../accets/signup-form-image.png';
 import FormBackground from '../../accets/login-form-background.jpg';
 import { useMutation } from "@apollo/client";
 import { SIGNUP_MUTATION } from "@/graphql/mutations";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const SignupPage = () => {
     const router = useRouter();
@@ -25,6 +28,8 @@ const SignupPage = () => {
       e.preventDefault();
       let valid = true;
       const newErrors = { name: "", email: "", password: "", confirmPassword: "" };
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   
       if (!name) {
         newErrors.name = "Name is required";
@@ -32,6 +37,9 @@ const SignupPage = () => {
       }
       if (!email) {
         newErrors.email = "Email is required";
+        valid = false;
+      }else if (!emailRegex.test(email)) {
+        newErrors.email = "Invalid email format";
         valid = false;
       }
       if (password.length < 8) {
@@ -48,12 +56,14 @@ const SignupPage = () => {
   
       try {
         const { data } = await signup({ variables: { name, email, password } });
-        console.log("Signup Response:", data);
         if (data?.signup) {
+          toast.success("Account created successfully!");
+          setTimeout(() => {
           router.push("/");
+        },2000);
         }
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Signup failed");
+        toast.error(err instanceof Error ? err.message : "Signup failed")
       }
     };
   
@@ -69,6 +79,7 @@ const SignupPage = () => {
           backgroundSize: "cover",
         }}
       >
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
         <Box
           className={styles.loginCard}
           sx={{
@@ -85,6 +96,7 @@ const SignupPage = () => {
             margin: "auto",
           }}
         >
+          <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
           <Box
             sx={{
               flex: 1,
@@ -182,11 +194,20 @@ const SignupPage = () => {
               </Button>
             </form>
   
-            {error && <Typography color="error">{error.message}</Typography>}
+            {error && <Typography color="error" sx={{marginTop: 3}}>{error.message}</Typography>}
   
-            <Typography variant="caption" className={styles.credit}>
+            <Typography sx={{marginTop: 2}} variant="caption" className={styles.credit}>
               ReadMate
             </Typography>
+            <Button
+              variant="outlined"
+              fullWidth
+              className={styles.backButton}
+              onClick={() => router.push("/")} 
+              sx={{ mt: 2 }}
+            >
+              Back to Login
+            </Button>
           </Box>
         </Box>
       </div>

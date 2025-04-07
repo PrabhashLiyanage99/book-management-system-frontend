@@ -31,9 +31,10 @@ const ADD_BOOK_MUTATION = gql`
 interface AddBookFormProps {
   open: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
-export default function AddBookForm({ open, onClose }: AddBookFormProps) {
+export default function AddBookForm({ open, onClose, onSuccess }: AddBookFormProps) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [genre, setGenre] = useState("");
@@ -47,13 +48,20 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
   });
 
   const [addBook, { loading, error }] = useMutation(ADD_BOOK_MUTATION);
+  const currentYear = new Date().getFullYear();
 
   const validateForm = () => {
     const newErrors: any = {};
     if (!title) newErrors.title = "Book title is required";
     if (!author) newErrors.author = "Author is required";
     if (!genre) newErrors.genre = "Genre is required";
-    if (!publishedYear) newErrors.publishedYear = "Published year is required";
+    if (!publishedYear){ 
+      newErrors.publishedYear = "Published year is required";
+    }else if (!/^\d{4}$/.test(publishedYear)) {
+      newErrors.publishedYear = "This is not a year"
+    }else if (+publishedYear < 1000 || +publishedYear > currentYear){
+      newErrors.publishedYear = `Wrong year`
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -71,6 +79,12 @@ export default function AddBookForm({ open, onClose }: AddBookFormProps) {
         }
       });
       onClose();
+      onSuccess();
+      setTitle("");
+      setAuthor("");
+      setGenre("");
+      setPublishedYear("");
+      setCoverImage("");
     } catch (err) {
       console.error("Error adding book:", err);
     }

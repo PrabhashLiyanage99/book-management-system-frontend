@@ -10,6 +10,9 @@ import LoginImage from '../accets/login-form-image.png';
 import FormBackground from '../accets/login-form-background.jpg';
 import { useMutation } from "@apollo/client";
 import { LOGIN_MUTATION } from "@/graphql/mutations";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -43,12 +46,14 @@ const LoginPage = () => {
       if (data?.login) {
         localStorage.setItem('token', data.login);
         router.push('/home');
+       toast.success("Login successfully!");
+          router.push('/home');
       } else {
-        alert('Invalid credentials');
+        toast.error('Invalid credentials');
+
       }
     } catch (err: any) {
-      console.error('Login failed:', err);
-      alert(err.message || 'Login failed');
+      toast.error(err.message || 'Login failed')
     }
   };
 
@@ -56,7 +61,7 @@ const LoginPage = () => {
     <div className={styles.loginContainer} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundImage: `url(${Background.src})`, backgroundSize: 'cover' }}>
       <Box className={styles.loginBackground}>
       </Box>
-      
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <Box className={styles.loginCard} 
         sx={{ 
           display: 'flex', 
@@ -150,8 +155,8 @@ const LoginPage = () => {
               Create Account
             </Button>
           </form>
-          
-          <Typography variant="caption" className={styles.credit}>
+          {error && <Typography color="error" sx={{marginTop: 3}}>{error.message}</Typography>}
+          <Typography sx={{marginTop: 2}} variant="caption" className={styles.credit}>
             ReadMate
           </Typography>
         </Box>
