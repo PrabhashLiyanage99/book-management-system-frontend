@@ -4,24 +4,34 @@ import SearchIcon from "@mui/icons-material/Search";
 import CategoryIcon from "@mui/icons-material/Category";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddBookForm from "@/components/form-addBook";
 import AuthWrapper from "@/components/AuthWrapper";
 import { useRouter } from "next/navigation";
 import Layout from "../../layout/layout";
 import { useQuery } from "@apollo/client";
 import { GET_BOOK_COUNT } from "../../graphql/mutations"
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function HomePage() {
     const [isFormVisible, setIsFormVisible] = useState(false);
     const router = useRouter();
+    
 
-    const { data, loading, error } = useQuery(GET_BOOK_COUNT, {
+    const { data, loading, error, refetch } = useQuery(GET_BOOK_COUNT, {
         variables: { page: 1, pageSize: 10 }, 
+     
     });
-
     if (loading) return <Typography>Loading...</Typography>;
     if (error) return <Typography>Error fetching data</Typography>;
+
+    const handleAddSuccess = () => {
+    toast.success("Book Added successfully!");
+    refetch();
+    };
+
 
   return (
     <AuthWrapper>
@@ -29,7 +39,7 @@ export default function HomePage() {
     <Box>
       <Box sx={{ background: "linear-gradient(to right, #ad79e1, #0099f2)", color: "white", textAlign: "center", py: 5 }}>
         <Typography variant="h4" fontWeight="bold">Welcome to Your Digital Library</Typography>
-        <Typography>Discover millions of books, manage your collection, and connect with readers worldwide.</Typography>
+        <Typography>Discover books and manage your collection.</Typography>
       </Box>
 
       <Container sx={{ mt: 5 , backgroundColor: "#fff"}}>
@@ -56,14 +66,15 @@ export default function HomePage() {
               <Card sx={{ p: 2, width: 400 }} >
                 <CardContent>
                   <Typography variant="h6" fontWeight="bold">Library Statistics</Typography>
-                  <Typography variant="h4">{data.getAllBooks.totalCount} Total Books</Typography> 
+                  <Typography variant="h4">{data?.getAllBooks?.totalCount} Total Books</Typography> 
                 </CardContent>
               </Card>
             </Grid>
           </Grid>
         </Grid>
       </Container>
-      <AddBookForm open={isFormVisible} onClose={() => setIsFormVisible(false)} />
+      <AddBookForm open={isFormVisible} onClose={() => setIsFormVisible(false)} onSuccess={handleAddSuccess} />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </Box>
     </Layout>
     </AuthWrapper>
